@@ -1,0 +1,1 @@
+docker run --rm --volumes-from jenkins -v $(pwd):/backup busybox tar cvf /backup/backup.tar /var/jenkins_home
