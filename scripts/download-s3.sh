@@ -1,20 +1,5 @@
-#!/bin/sh 
-outputFile="Your_PATH"
-amzFile="AMAZON_FILE_PATH"
-bucket="YOUR_BUCKET"
-
-resource="/${bucket}/${amzFile}"
-contentType="application/x-compressed-tar"
-dateValue=`date -R`
-stringToSign="GET\n\n${contentType}\n${dateValue}\n${resource}"
-
-s3Key="YOUR_S3_KEY"
-s3Secret="YOUR_S3SECRET"
-
-signature=`echo -en ${stringToSign} | openssl sha1 -hmac ${s3Secret} -binary | base64`
-
-curl  -H "Host: ${bucket}.s3.amazonaws.com" \
-     -H "Date: ${dateValue}" \
-     -H "Content-Type: ${contentType}" \
-     -H "Authorization: AWS ${s3Key}:${signature}" \
-     https://${bucket}.s3.amazonaws.com/${amzFile} -o $outputFile
+#!/bin/bash
+aws s3 cp s3://malcak-jenkins-state/backup.tar.gz /home/ec2-user/
+sudo docker run --rm -v /home/ec2-user/:/backup busybox tar -xzvf /backup/backup.tar.gz -C /backup/
+sudo mv /home/ec2-user/var/jenkins_home /home/ec2-user/jenkins-volume
+sudo rm -rf /home/ec2-user/var /home/ec2-user/backup.tar.gz

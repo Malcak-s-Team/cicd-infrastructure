@@ -24,5 +24,14 @@ variable "vpc_cidr" {
 variable "allowed_ports" {
   description = "List of allowed ports"
   type        = list(any)
-  default     = ["22", "8080"]
+  default     = ["22", "8080", "80", "443"]
+}
+
+variable "aws_access_key_id" {
+  description = "aws access key id"
+  type        = string
+}
+variable "aws_secret_access_key" {
+  description = "aws secret access key"
+  type        = string
 }

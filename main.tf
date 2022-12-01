@@ -23,6 +23,11 @@ provider "aws" {
 #   project = var.project
 # }
 
+module "jenkins_state" {
+  source = "./modules/s3"
+  name   = "malcak-jenkins-state"
+}
+
 resource "aws_vpc" "cicd_vpc" {
   cidr_block           = var.vpc_cidr
   instance_tenancy     = "default"
@@ -94,20 +99,43 @@ resource "aws_instance" "jenkins_instance" {
   subnet_id              = aws_subnet.publicsubnet.id
   vpc_security_group_ids = aws_security_group.jenkins_sg.*.id
 
-  provisioner "file" {
-    source      = "./scripts/docker-compose.yml"
-    destination = "/home/ec2-user/docker-compose.yml"
-
-    connection {
-      type        = "ssh"
-      host        = aws_instance.jenkins_instance.public_ip
-      user        = "ec2-user"
-      private_key = file("./keys/jenkins")
-      insecure    = true
-    }
+  root_block_device {
+    volume_size = 16
   }
 
-  user_data = file("scripts/install-docker.sh")
+  tags = {
+    "Name" = "Jenkins Master Node"
+  }
+
+  connection {
+    type        = "ssh"
+    user        = "ec2-user"
+    host        = aws_instance.jenkins_instance.public_ip
+    private_key = file("./keys/jenkins")
+  }
+
+  provisioner "file" {
+    source      = "./scripts"
+    destination = "/home/ec2-user/"
+  }
+
+  provisioner "remote-exec" {
+    inline = [
+      "sleep 10",
+      "export AWS_ACCESS_KEY_ID=${var.aws_access_key_id}",
+      "export AWS_SECRET_ACCESS_KEY=${var.aws_secret_access_key}",
+      "export AWS_DEFAULT_REGION=${var.region}",
+      "export S3_BUCKET=malcak-jenkins-state",
+      "chmod +x -R /home/ec2-user/scripts",
+      "/home/ec2-user/scripts/install-docker.sh",
+      "/home/ec2-user/scripts/install-docker-compose.sh",
+      "/home/ec2-user/scripts/install-awscli.sh",
+      "/home/ec2-user/scripts/download-s3.sh",
+      "/home/ec2-user/scripts/launch-jenkins.sh",
+      "/home/ec2-user/scripts/launch-caddy.sh",
+      "sleep 10",
+    ]
+  }
 }
 
 resource "aws_instance" "jenkins_worker" {
@@ -117,5 +145,80 @@ resource "aws_instance" "jenkins_worker" {
   subnet_id              = aws_subnet.publicsubnet.id
   vpc_security_group_ids = aws_security_group.jenkins_sg.*.id
 
-  user_data = file("scripts/worker.sh")
+  root_block_device {
+    volume_size = 24
+  }
+
+
+  connection {
+    type        = "ssh"
+    user        = "ec2-user"
+    host        = aws_instance.jenkins_worker.public_ip
+    private_key = file("./keys/jenkins")
+  }
+
+  provisioner "file" {
+    source      = "./scripts"
+    destination = "/home/ec2-user/"
+  }
+
+  provisioner "remote-exec" {
+    inline = [
+      "sleep 10",
+      "export AWS_ACCESS_KEY_ID=${var.aws_access_key_id}",
+      "export AWS_SECRET_ACCESS_KEY=${var.aws_secret_access_key}",
+      "chmod +x -R /home/ec2-user/scripts",
+      "/home/ec2-user/scripts/install-docker.sh",
+      "/home/ec2-user/scripts/install-docker-compose.sh",
+      "/home/ec2-user/scripts/install-jdk11.sh",
+      "/home/ec2-user/scripts/install-awscli.sh",
+      "/home/ec2-user/scripts/install-terraform.sh",
+      "mkdir /home/ec2-user/jenkins",
+      "sleep 10",
+    ]
+  }
+
+  tags = {
+    "Name" : "Jenkins Worker Node"
+  }
+}
+
+resource "aws_instance" "sonarqube" {
+  ami                    = data.aws_ami.latest_amazon_linux.id
+  instance_type          = "t2.micro"
+  key_name               = aws_key_pair.jenkins.key_name
+  subnet_id              = aws_subnet.publicsubnet.id
+  vpc_security_group_ids = aws_security_group.jenkins_sg.*.id
+
+  root_block_device {
+    volume_size = 16
+  }
+
+  tags = {
+    "Name" = "Sonarqube Node"
+  }
+
+  connection {
+    type        = "ssh"
+    user        = "ec2-user"
+    host        = aws_instance.sonarqube.public_ip
+    private_key = file("./keys/jenkins")
+  }
+
+  provisioner "file" {
+    source      = "./scripts"
+    destination = "/home/ec2-user/"
+  }
+
+  provisioner "remote-exec" {
+    inline = [
+      "sleep 10",
+      "chmod +x -R /home/ec2-user/scripts",
+      "/home/ec2-user/scripts/install-docker.sh",
+      "/home/ec2-user/scripts/install-docker-compose.sh",
+      "/home/ec2-user/scripts/launch-sonarqube.sh",
+      "/home/ec2-user/scripts/launch-caddy-sonar.sh",
+      "sleep 10",
+    ]
+  }
 }
