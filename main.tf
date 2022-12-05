@@ -94,7 +94,7 @@ resource "aws_key_pair" "jenkins" {
 
 resource "aws_instance" "jenkins_instance" {
   ami                    = data.aws_ami.latest_amazon_linux.id
-  instance_type          = "t2.small"
+  instance_type          = "t2.medium"
   key_name               = aws_key_pair.jenkins.key_name
   subnet_id              = aws_subnet.publicsubnet.id
   vpc_security_group_ids = aws_security_group.jenkins_sg.*.id
@@ -135,7 +135,7 @@ resource "aws_instance" "jenkins_instance" {
   }
 
   tags = {
-    "Name" = "Jenkins Master Node"
+    "Name" = "Automation Node"
   }
 }
 
@@ -181,7 +181,7 @@ resource "aws_instance" "jenkins_worker" {
   }
 
   tags = {
-    "Name" : "Jenkins Worker Node"
+    "Name" : "Worker Node"
   }
 }
 
