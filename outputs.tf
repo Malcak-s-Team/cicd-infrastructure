@@ -1,3 +1,11 @@
+output "bucket" {
+  value = module.backend.bucket
+}
+
+output "dynamodb_table" {
+  value = module.backend.dynamodb_table
+}
+
 output "jenkins_state" {
   value = module.jenkins_state.bucket
 }
