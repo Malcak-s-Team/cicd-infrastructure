@@ -103,10 +103,6 @@ resource "aws_instance" "jenkins_instance" {
     volume_size = 16
   }
 
-  tags = {
-    "Name" = "Jenkins Master Node"
-  }
-
   connection {
     type        = "ssh"
     user        = "ec2-user"
@@ -136,6 +132,10 @@ resource "aws_instance" "jenkins_instance" {
       "/home/ec2-user/scripts/launch-caddy.sh",
       "sleep 10",
     ]
+  }
+
+  tags = {
+    "Name" = "Jenkins Master Node"
   }
 }
 
@@ -196,10 +196,6 @@ resource "aws_instance" "sonarqube" {
     volume_size = 16
   }
 
-  tags = {
-    "Name" = "Sonarqube Node"
-  }
-
   connection {
     type        = "ssh"
     user        = "ec2-user"
@@ -222,5 +218,9 @@ resource "aws_instance" "sonarqube" {
       "/home/ec2-user/scripts/launch-caddy-sonar.sh",
       "sleep 10",
     ]
+  }
+
+  tags = {
+    "Name" = "Sonarqube Node"
   }
 }
