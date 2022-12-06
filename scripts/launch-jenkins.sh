@@ -14,4 +14,4 @@ services:
       - "/var/run/docker.sock:/var/run/docker.sock"
       - "/home/ec2-user/jenkins/jenkins-volume:/var/jenkins_home"
 EOF
-sudo docker compose -f /home/ec2-user/docker-compose.yml up -d
+sudo docker compose -f /home/ec2-user/jenkins/docker-compose.yml up -d
