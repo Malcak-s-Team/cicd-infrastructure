@@ -137,3 +137,42 @@ resource "aws_instance" "sonarqube" {
     "Name" = "Sonarqube Node"
   }
 }
+
+resource "aws_instance" "grafana" {
+  ami                    = data.aws_ami.latest_amazon_linux.id
+  instance_type          = var.instance_type
+  key_name               = aws_key_pair.cicd.key_name
+  subnet_id              = aws_subnet.public.id
+  vpc_security_group_ids = aws_security_group.cicd.*.id
+
+  root_block_device {
+    volume_size = 30
+    tags = {
+      "Name" = "Grafana Node Disk"
+    }
+  }
+
+  connection {
+    type        = "ssh"
+    user        = "ec2-user"
+    host        = self.public_ip
+    private_key = file("./keys/cicd")
+  }
+
+  provisioner "file" {
+    source      = "./scripts"
+    destination = "/home/ec2-user/"
+  }
+
+  provisioner "remote-exec" {
+    inline = [
+      "chmod u+x -R /home/ec2-user/scripts",
+      "/home/ec2-user/scripts/install-docker-compose.sh",
+      "/home/ec2-user/scripts/launch-grafana.sh",
+    ]
+  }
+
+  tags = {
+    "Name" = "Grafana Node"
+  }
+}
