@@ -1,5 +1,5 @@
 # !/bin/bash
-cat <<EOF > /home/ec2-user/jenkins/docker-compose.yml
+cat <<EOF > ${workpath}/docker-compose.yml
 services:
   jenkins:
     container_name: jenkins
@@ -12,6 +12,6 @@ services:
       - 50000:50000
     volumes:
       - "/var/run/docker.sock:/var/run/docker.sock"
-      - "/home/ec2-user/jenkins/jenkins-volume:/var/jenkins_home"
+      - "${workpath}/jenkins-volume:/var/jenkins_home"
 EOF
-sudo docker compose -f /home/ec2-user/jenkins/docker-compose.yml up -d
+docker compose -f ${workpath}/docker-compose.yml up -d

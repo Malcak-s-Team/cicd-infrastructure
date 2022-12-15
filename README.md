@@ -7,6 +7,7 @@
 ### Resources that it launches
 - 1 S3 bucket for the terraform state
 - 1 S3 bucket to store jenkins backups
+- 1 IAM role to use the bucket for jenkins backups
 - 1 Virtual private cloud
 - 1 Internet gateway
 - 1 Public subnet
@@ -27,6 +28,7 @@ Create a key pair for the connection to the EC2 instances, make sure the keys ar
 ```sh
 ssh-keygen -t rsa -b 4096
 ```
+Store both keys in the `keys` folder
 
 #### 4. Prepare your AWS credentials
 For example you can run this commands.
@@ -37,21 +39,23 @@ export AWS_REGION=<your_aws_region>
 ```
 
 #### 5. Check **jenkins** backup
-If you don't have a **Jenkins** backup and just want to start it from scratch, simply comment out the lines in the `instances.tf` file, to skip those steps.
+If you don't have a **Jenkins** backup and just want to start it from scratch, simply comment out the lines in the `src/scripts/download-backup-s3.sh` file, to skip those steps.
+
+---
+> Next steps are inside `src` folder
+---
 
 #### 6. Prepare s3 bucket for terraform state
 First comment out the backend lines in `main.tf`, because you obviously don't have it yet.
 ```
 terraform init
-terraform apply -target module.backen
+terraform apply -target module.backend
 ```
-And now uncomment the backend statement again, remember to re-run the `terraform init` command.
+And now uncomment the backend statement again, remember to re-run the `terraform init` command to move your state file to the new backend.
 
 #### 6. Finally run the terraform commands
 ```
 terraform init
 terraform apply \
-  -var aws_access_key_id=$AWS_ACCESS_KEY_ID \
-  -var aws_secret_access_key=$AWS_SECRET_ACCESS_KEY \
   -var jenkins_backup_revision=the_backup_filename.tar.gz
 ```

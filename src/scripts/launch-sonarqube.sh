@@ -1,13 +1,13 @@
 # !/bin/bash
-sudo sysctl -w vm.max_map_count=524288
-sudo sysctl -w fs.file-max=131072
-sudo ulimit -n 131072
-sudo ulimit -u 8192
-sudo docker volume create --name sonarqube_data
-sudo docker volume create --name sonarqube_logs
-sudo docker volume create --name sonarqube_extensions
-mkdir -p /home/ec2-user/sonar
-cat <<EOF > /home/ec2-user/sonar/docker-compose.yml
+sysctl -w vm.max_map_count=524288
+sysctl -w fs.file-max=131072
+ulimit -n 131072
+ulimit -u 8192
+docker volume create --name sonarqube_data
+docker volume create --name sonarqube_logs
+docker volume create --name sonarqube_extensions
+mkdir -p ${workpath}
+cat <<EOF > ${workpath}/docker-compose.yml
 services:
   sonarqube:
     container_name: sonar
@@ -43,4 +43,4 @@ volumes:
   postgresql:
   postgresql_data:
 EOF
-sudo docker compose -f /home/ec2-user/sonar/docker-compose.yml up -d
+docker compose -f ${workpath}/docker-compose.yml up -d

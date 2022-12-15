@@ -21,17 +21,8 @@ variable "instance_type" {
   default     = "t2.medium"
 }
 
-variable "aws_access_key_id" {
-  description = "aws access key id"
-  type        = string
-}
-
-variable "aws_secret_access_key" {
-  description = "aws secret access key"
-  type        = string
-}
-
 variable "jenkins_backup_revision" {
   description = "Backup file name"
   type        = string
+  default     = "backup.tar.gz"
 }
