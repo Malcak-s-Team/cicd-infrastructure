@@ -53,9 +53,12 @@ terraform apply -target module.backend
 ```
 And now uncomment the backend statement again, remember to re-run the `terraform init` command to move your state file to the new backend.
 
-#### 6. Finally run the terraform commands
+#### 6. Run the terraform commands
 ```
 terraform init
 terraform apply \
   -var jenkins_backup_revision=the_backup_filename.tar.gz
 ```
+
+#### 7. Set up your credentials
+Set up your credentials through Hashicorp Vault, and follow this (https://developer.hashicorp.com/vault/tutorials/auth-methods/approle) tutorial to set up the credentials in Jenkins.
