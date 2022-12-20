@@ -17,3 +17,7 @@ output "sonarqube_instance_public_ip" {
 output "grafana_instance_public_ip" {
   value = aws_instance.grafana.public_ip
 }
+
+output "vault_instance_public_ip" {
+  value = aws_instance.vault.public_ip
+}

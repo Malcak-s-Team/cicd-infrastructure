@@ -31,3 +31,8 @@ module "jenkins_state" {
   source = "./modules/s3"
   name   = "${data.aws_iam_account_alias.current.account_alias}-jenkins-backups"
 }
+
+module "vault_dynamodb" {
+  source = "./modules/vault-dynamodb"
+  name   = "cicd-vault-storage"
+}

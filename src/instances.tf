@@ -87,3 +87,29 @@ resource "aws_instance" "grafana" {
     "Name" = "Grafana Server"
   }
 }
+
+resource "aws_instance" "vault" {
+  ami                    = data.aws_ami.latest_amazon_linux.id
+  instance_type          = var.instance_type
+  key_name               = aws_key_pair.cicd.key_name
+  subnet_id              = aws_subnet.public.id
+  vpc_security_group_ids = [aws_security_group.cicd.id, aws_security_group.vault.id]
+  iam_instance_profile   = aws_iam_instance_profile.vault.id
+
+  root_block_device {
+    volume_size = 30
+    tags = {
+      "Name" = "Vault Server Disk"
+    }
+  }
+
+  user_data_base64 = data.template_cloudinit_config.vault_config.rendered
+
+  tags = {
+    "Name" = "Vault Server"
+  }
+
+  lifecycle {
+    prevent_destroy = true
+  }
+}

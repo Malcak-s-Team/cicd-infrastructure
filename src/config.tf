@@ -163,3 +163,40 @@ data "template_cloudinit_config" "grafana_config" {
     })
   }
 }
+
+data "template_cloudinit_config" "vault_config" {
+  gzip          = true
+  base64_encode = true
+
+  part {
+    filename     = "init.tpl"
+    content_type = "text/x-shellscript"
+    content = templatefile("${path.module}/scripts/init.tpl", {
+      workdir = "vault"
+    })
+  }
+
+  part {
+    filename     = "install-docker-compose.sh"
+    content_type = "text/x-shellscript"
+    content      = file("${path.module}/scripts/install-docker-compose.sh")
+  }
+
+  part {
+    filename     = "launch-vault.sh"
+    content_type = "text/x-shellscript"
+    content = templatefile("${path.module}/scripts/launch-vault.sh", {
+      storage = "${module.vault_dynamodb.table_name}"
+    })
+  }
+
+  part {
+    filename     = "launch-caddy-https.sh"
+    content_type = "text/x-shellscript"
+    content = templatefile("${path.module}/scripts/launch-caddy-https.sh", {
+      path      = "/home/ec2-user"
+      subdomain = "vault"
+      port      = "8200"
+    })
+  }
+}
