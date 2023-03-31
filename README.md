@@ -13,7 +13,7 @@
 - 1 Public subnet
 - 1 Security group
 - 1 Key pair
-- 4 EC2 Instances (for jenkins, jenkins worker, sonarqube, grafana, and vault)
+- 5 EC2 Instances (for jenkins, jenkins worker, sonarqube, grafana, and vault)
 
 ## Steps to launch the infrastructure
 First of all, if you want to set up the project you must of course install the tools mentioned above.
