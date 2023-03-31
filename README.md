@@ -13,7 +13,7 @@
 - 1 Public subnet
 - 1 Security group
 - 1 Key pair
-- 4 EC2 Instances (for jenkins, jenkins worker, sonarqube, and grafana)
+- 4 EC2 Instances (for jenkins, jenkins worker, sonarqube, grafana, and vault)
 
 ## Steps to launch the infrastructure
 First of all, if you want to set up the project you must of course install the tools mentioned above.
@@ -62,3 +62,6 @@ terraform apply \
 
 #### 7. Set up your credentials
 Set up your credentials through Hashicorp Vault, and follow this (https://developer.hashicorp.com/vault/tutorials/auth-methods/approle) tutorial to set up the credentials in Jenkins.
+
+#### 8. Populate Vault
+...
